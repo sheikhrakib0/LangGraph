@@ -26,10 +26,16 @@ if user_input:
 
     # preparing initial state for chatbot
     initial_state = ChatState(messages=[HumanMessage(content=user_input)])
-    result = chatbot.invoke(initial_state, config=Config)
-    bot_response = result["messages"][-1]
+    #result = chatbot.invoke(initial_state, config=Config)
+    #bot_response = result["messages"][-1]
+    
+    
+    
+    with st.chat_message("assistant"):
+
+        ai_message = st.write_stream(
+            message_chunk.content for message_chunk, metadata in chatbot.stream(initial_state, config=Config, stream_mode="messages")
+        )
     
     # adding response to session state
-    st.session_state["message_history"].append({"role": "assistant", "content": bot_response.content})
-    with st.chat_message("assistant"):
-        st.text(bot_response.content)
+    st.session_state["message_history"].append({"role": "assistant", "content": ai_message})

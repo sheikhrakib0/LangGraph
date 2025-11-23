@@ -40,6 +40,10 @@ chatbot = graph.compile(checkpointer=checkpoint)
 #Config = {"configurable": {
 #    "thread_id": "thread_001"}
 #}
+
 #initial_state = ChatState(messages=[HumanMessage(content=input("You: "))])
-#result = chatbot.invoke(initial_state, config=Config)
+#generator = chatbot.stream(initial_state, config=Config, #stream_mode="messages")
+
+#for message_chunk, metadata in generator:
+#    print(message_chunk.content, end="", flush=True)
 #print("Bot:", result["messages"][-1].content)
