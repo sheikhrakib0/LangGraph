@@ -7,26 +7,37 @@ import uuid
 st.title("Chatbot with LangGraph and Google Gemini")
 
 # Utility functions
-def generate_thread_id():
+def generate_thread_id(thread_name="New Chat"):
     thread_id = str(uuid.uuid4())
-    return thread_id
+    full_uuid = str(uuid.uuid4())
+    thread_name = full_uuid[:5]
+    thread = {"thread_id": thread_id, "thread_name": thread_name}
+    return thread
 
 def reset_ui():
-    
-    thread_id = generate_thread_id()
+    st.session_state.message_history.clear()
+    thread = generate_thread_id()
+    thread_id = thread['thread_id']
     st.session_state["thread_id"] = thread_id
-    add_thread(thread_id)
+    add_thread(thread)
+    st.rerun()
 
-def add_thread(thread_id):
-    if thread_id not in st.session_state["chat_threads"]:
-        st.session_state["chat_threads"].append(thread_id)
+def thread_check(thread):
+    for thrd in st.session_state["chat_threads"]:
+        if thrd['thread_id'] == thread['thread_id']:
+            return True
+    return False
+
+def add_thread(thread):
+    check = thread_check(thread)
+    if check == False:
+        st.session_state["chat_threads"].append(thread)
 
 def load_msg(thread_id):
     Config = {"configurable": {
     "thread_id": thread_id}}
     response = chatbot.get_state(config=Config)
-    print(response.values)
-    messages = response.values['messages']
+    messages = response.values.get('messages',[])
     message_temp = []
     for message in messages:
         #print("called message", message)
@@ -36,6 +47,7 @@ def load_msg(thread_id):
             role='assistant'
         message_temp.append({'role':role, 'content':message.content})
     st.session_state['message_history'] = message_temp
+    st.rerun()
 
 
 
@@ -43,35 +55,40 @@ def load_msg(thread_id):
 if "message_history" not in st.session_state:
     st.session_state["message_history"] = []
 
-if "thread_id" not in st.session_state:
-    st.session_state["thread_id"] = generate_thread_id()
 
 if "chat_threads" not in st.session_state:
     st.session_state["chat_threads"] = []
 
-add_thread(st.session_state["thread_id"])
+if "thread_id" not in st.session_state:
+    new_thread = generate_thread_id(thread_name="New Chat")
+    st.session_state["thread_id"] = new_thread["thread_id"]
+    # sending full thread dict to chat_threads. 
+    # add_thread() should be down to the creation of chat_threads
+    add_thread(new_thread)
 
 # check persistence of thread id in session state
 Config = {"configurable": {
     "thread_id": st.session_state["thread_id"]}}
+
+
+# ******************* UI Part *******************
 
 # laoding all messages from session state
 for msg in st.session_state["message_history"]:
     with st.chat_message(msg["role"]):
         st.text(msg["content"])
 
-# ******************* UI Part *******************
-
 # Side bar
 st.sidebar.title("LangGraph Chatbot")
 if st.sidebar.button("New Chat"):
-    st.session_state.message_history.clear()
     reset_ui()
 st.sidebar.header("My Conversations")
-for thread in st.session_state["chat_threads"]:
-    if st.sidebar.button(thread):
-        load_msg(thread)
-
+for thread in st.session_state["chat_threads"][::-1]:
+    button_name = thread['thread_name']
+    thread_id = thread['thread_id']
+    if st.sidebar.button(button_name):
+        st.session_state["thread_id"] = thread_id
+        load_msg(thread_id)
 
 
 # taking a user input
