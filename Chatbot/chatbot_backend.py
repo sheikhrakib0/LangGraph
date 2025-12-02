@@ -16,7 +16,7 @@ llm = ChatGoogleGenerativeAI(model = "gemini-2.5-flash", temperature=0.7)
 
 # defining state
 class ChatState(BaseModel):
-    messages: Annotated[List[BaseMessage], add_messages()]
+    messages: Annotated[List[BaseMessage], add_messages()] # type: ignore
 
 # define chatting function
 def chat(state: ChatState):

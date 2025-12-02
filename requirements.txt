@@ -2,3 +2,4 @@ langgraph
 langchain
 dotenv
 langchain_google_genai
+langgraph-checkpoint-sqlite # for small db

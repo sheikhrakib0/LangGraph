@@ -1,6 +1,6 @@
 ##### importing necessary libraries
 import streamlit as st
-from chatbot_backend import chatbot, ChatState
+from db_chatbot_backend import chatbot, ChatState, get_all_threads, get_thread_config
 from langchain_core.messages import HumanMessage
 import uuid
 
@@ -57,14 +57,8 @@ if "message_history" not in st.session_state:
 
 
 if "chat_threads" not in st.session_state:
-    st.session_state["chat_threads"] = []
+    st.session_state["chat_threads"] = get_all_threads()
 
-if "thread_id" not in st.session_state:
-    new_thread = generate_thread_id(thread_name="New Chat")
-    st.session_state["thread_id"] = new_thread["thread_id"]
-    # sending full thread dict to chat_threads. 
-    # add_thread() should be down to the creation of chat_threads
-    add_thread(new_thread)
 
 # check persistence of thread id in session state
 Config = {"configurable": {
@@ -95,6 +89,15 @@ for thread in st.session_state["chat_threads"][::-1]:
 user_input = st.chat_input("Type here")
 
 if user_input:
+    # Adding new thread to the session
+    if "thread_id" not in st.session_state:
+        new_thread_config = get_thread_config(msg=user_input)
+        new_thread = new_thread_config['configurable']
+        st.session_state["thread_id"] = new_thread["thread_id"]
+        # sending full thread dict to chat_threads. 
+        # add_thread() should be down to the creation of chat_threads
+        add_thread(new_thread)
+
     # displaying user message
     st.session_state["message_history"].append({"role": "user", "content": user_input})
     with st.chat_message("user"):
