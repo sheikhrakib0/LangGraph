@@ -123,12 +123,12 @@ chatbot = graph.compile(checkpointer=checkpoint)
 ############# checking purposes  ###############
 
 # chatbot check for invokation
-msg = "What is the capital of Bangladesh? and Area?"
-Config = get_thread_config(msg)
+#msg = "What is the capital of Bangladesh? and Area?"
+#Config = get_thread_config(msg)
 
-initial_state = ChatState(messages=[HumanMessage(content="You: What is the capital of Bangladesh? and Area?")])
-response = chatbot.invoke(initial_state, config=Config) #type: ignore
-print(response)
+#initial_state = ChatState(messages=[HumanMessage(content="You: What is the capital of Bangladesh? and Area?")])
+#response = chatbot.invoke(initial_state, config=Config) #type: ignore
+#print(response)
 
-all_threads = get_all_threads()
-print(all_threads)
+#all_threads = get_all_threads()
+#print(all_threads)

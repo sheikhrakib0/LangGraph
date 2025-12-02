@@ -16,10 +16,8 @@ def generate_thread_id(thread_name="New Chat"):
 
 def reset_ui():
     st.session_state.message_history.clear()
-    thread = generate_thread_id()
-    thread_id = thread['thread_id']
-    st.session_state["thread_id"] = thread_id
-    add_thread(thread)
+    if st.session_state['thread_id']:
+        del st.session_state["thread_id"]
     st.rerun()
 
 def thread_check(thread):
@@ -59,10 +57,8 @@ if "message_history" not in st.session_state:
 if "chat_threads" not in st.session_state:
     st.session_state["chat_threads"] = get_all_threads()
 
+#print("initial session state: ", st.session_state)
 
-# check persistence of thread id in session state
-Config = {"configurable": {
-    "thread_id": st.session_state["thread_id"]}}
 
 
 # ******************* UI Part *******************
@@ -80,7 +76,7 @@ st.sidebar.header("My Conversations")
 for thread in st.session_state["chat_threads"][::-1]:
     button_name = thread['thread_name']
     thread_id = thread['thread_id']
-    if st.sidebar.button(button_name):
+    if st.sidebar.button(button_name, key=thread_id):
         st.session_state["thread_id"] = thread_id
         load_msg(thread_id)
 
@@ -105,6 +101,8 @@ if user_input:
 
     # preparing initial state for chatbot
     initial_state = ChatState(messages=[HumanMessage(content=user_input)])
+    Config = {"configurable": {
+        "thread_id": st.session_state["thread_id"]}}
     #result = chatbot.invoke(initial_state, config=Config)
     #bot_response = result["messages"][-1]
     
@@ -116,3 +114,6 @@ if user_input:
     
     # adding response to session state
     st.session_state["message_history"].append({"role": "assistant", "content": ai_message})
+    st.rerun()
+
+print("last session state:", st.session_state)
