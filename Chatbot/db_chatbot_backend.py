@@ -52,8 +52,8 @@ checkpoint = SqliteSaver(conn)
 
 def generate_chat_title_from_txt(text:str)-> str:
     text = text.strip()
-    if len(text) >= 60:
-        text = text[:60] + "..."
+    if len(text) >= 30:
+        text = text[:30] + "..."
     return text
 
 def get_thread_config(msg:str, thread_id=None):

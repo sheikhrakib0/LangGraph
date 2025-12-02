@@ -73,7 +73,8 @@ st.sidebar.title("LangGraph Chatbot")
 if st.sidebar.button("New Chat"):
     reset_ui()
 st.sidebar.header("My Conversations")
-for thread in st.session_state["chat_threads"][::-1]:
+all_threads = get_all_threads()
+for thread in all_threads:
     button_name = thread['thread_name']
     thread_id = thread['thread_id']
     if st.sidebar.button(button_name, key=thread_id):
@@ -115,5 +116,3 @@ if user_input:
     # adding response to session state
     st.session_state["message_history"].append({"role": "assistant", "content": ai_message})
     st.rerun()
-
-print("last session state:", st.session_state)
